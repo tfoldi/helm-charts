@@ -62,22 +62,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 
 {{/*
-Get the Postgresql credentials secret.
+Get the Postgresql credentials secret (external db only).
 */}}
 {{- define "lightdash.postgresql.secretName" -}}
-{{- if and (.Values.postgresql.enabled) (not .Values.postgresql.existingSecret) -}}
-    {{- printf "%s" (include "lightdash.postgresql.fullname" .) -}}
-{{- else if and (.Values.postgresql.enabled) (.Values.postgresql.existingSecret) -}}
-    {{- printf "%s" .Values.postgresql.existingSecret -}}
-{{- else }}
-    {{- if .Values.externalDatabase.existingSecret -}}
-        {{- printf "%s" .Values.externalDatabase.existingSecret -}}
-    {{- else -}}
-        {{ printf "%s-%s" .Release.Name "externaldb" }}
-    {{- end -}}
+{{- ternary (include "lightdash.postgresql.fullname") .Values.externalDatabase.existingSecret .Values.externalDatabase.existingSecret -}}
 {{- end -}}
-{{- end -}}
-
 
 {{/*
 Add environment variables to configure database values
@@ -103,19 +92,22 @@ Add environment variables to configure database values
 {{/*
 Add environment variables to configure database values
 */}}
-{{- define "lightdash.database.existingsecret.key" -}}
-{{- if .Values.postgresql.enabled -}}
-    {{- printf "%s" "postgresql-password" -}}
+{{- define "lightdash.database.secret.passwordKey" -}}
+{{- if .Values.externalDatabase.existingSecretPasswordKey -}}
+    {{- printf "%s" .Values.externalDatabase.existingSecretPasswordKey -}}
 {{- else -}}
-    {{- if .Values.externalDatabase.existingSecret -}}
-        {{- if .Values.externalDatabase.existingSecretPasswordKey -}}
-            {{- printf "%s" .Values.externalDatabase.existingSecretPasswordKey -}}
-        {{- else -}}
-            {{- printf "%s" "postgresql-password" -}}
-        {{- end -}}
-    {{- else -}}
-        {{- printf "%s" "postgresql-password" -}}
-    {{- end -}}
+    {{- printf "%s" "postgresql-password" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Add environment variables to configure database values
+*/}}
+{{- define "lightdash.database.secret.userKey" -}}
+{{- if .Values.externalDatabase.existingSecretUserKey -}}
+    {{- printf "%s" .Values.externalDatabase.existingSecretUserKey -}}
+{{- else -}}
+    {{- printf "%s" "postgresql-user" -}}
 {{- end -}}
 {{- end -}}
 
@@ -146,6 +138,7 @@ Add environment variables to configure database values
     {{- .Values.serviceAccount.name | default "default" -}}
 {{- end -}}
 {{- end -}}
+
 
 {{/*
  Create the name of the backend configuration
