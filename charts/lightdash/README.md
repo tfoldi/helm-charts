@@ -59,6 +59,7 @@ If you don't want helm to manage this, you may wish to separately create a secre
 | externalDatabase.database | string | `"lightdash"` |  |
 | externalDatabase.existingSecret | string | `""` |  |
 | externalDatabase.existingSecretPasswordKey | string | `""` |  |
+| externalDatabase.existingSecretUserKey | string | `""` |  |
 | externalDatabase.host | string | `"localhost"` |  |
 | externalDatabase.password | string | `""` |  |
 | externalDatabase.port | int | `5432` |  |
@@ -86,7 +87,6 @@ If you don't want helm to manage this, you may wish to separately create a secre
 | postgresql.commonAnnotations."helm.sh/hook-weight" | string | `"-1"` |  |
 | postgresql.containerSecurityContext.runAsNonRoot | bool | `true` |  |
 | postgresql.enabled | bool | `true` |  |
-| postgresql.existingSecret | string | `""` |  |
 | postgresql.postgresqlDatabase | string | `"lightdash"` |  |
 | postgresql.postgresqlPassword | string | `"lightdash"` |  |
 | postgresql.postgresqlUsername | string | `"postgres"` |  |
